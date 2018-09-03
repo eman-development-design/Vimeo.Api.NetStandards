@@ -7,6 +7,9 @@
     <Authors>Eman Development &amp; Design</Authors>
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <WarningLevel>3</WarningLevel>
+  </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
   </ItemGroup>
