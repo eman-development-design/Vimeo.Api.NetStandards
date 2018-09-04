@@ -133,9 +133,14 @@ namespace Vimeo.Api.NetStandards.Model
         [JsonProperty("user")]
         public User User { get; set; }
 
-        // review_page (can be ignorable) todo
+        /// <summary>
+        /// Review Page
+        /// </summary>
+        [JsonProperty("review_page", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public ReviewPage ReviewPage { get; set; }
 
-        // parent_folder (can be ignorable) todo
+        [JsonProperty("parent_folder", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public SubCategory ParentFolder { get; set; } // todo: verify the type is correct.
 
         /// <summary>
         /// Last user action event date
@@ -143,11 +148,23 @@ namespace Vimeo.Api.NetStandards.Model
         [JsonProperty("last_user_action_event_date", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public DateTime LastUserActionEventDate { get; set; }
 
-        // files (can be ignorable) todo
+        /// <summary>
+        /// Files
+        /// </summary>
+        [JsonProperty("files", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public List<File> Files { get; set; }
 
-        // download (can be ignorable) todo
+        /// <summary>
+        /// Download List
+        /// </summary>
+        [JsonProperty("download", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public List<File> Download { get; set; }
 
-        // app todo
+        /// <summary>
+        /// App
+        /// </summary>
+        [JsonProperty("app", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public App App { get; set; }
 
         /// <summary>
         /// Status
@@ -161,10 +178,22 @@ namespace Vimeo.Api.NetStandards.Model
         [JsonProperty("resource_key")]
         public string ResourceKey { get; set; }
 
-        // upload todo
+        /// <summary>
+        /// Upload
+        /// </summary>
+        [JsonProperty("upload")]
+        public VideoUpload Upload { get; set; }
 
-        // transcode todo
+        /// <summary>
+        /// Transcode
+        /// </summary>
+        [JsonProperty("transcode")]
+        public Transcode Transcode { get; set; }
 
-        // embed_presets (can be ignorable) todo
+        /// <summary>
+        /// Embed Presets
+        /// </summary>
+        [JsonProperty("embed_presets")]
+        public EmbedPresets EmbedPresets { get; set; }
     }
 }
