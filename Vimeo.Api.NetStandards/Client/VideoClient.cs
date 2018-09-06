@@ -1,3 +1,6 @@
+using System;
+using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Text;
@@ -16,6 +19,7 @@ namespace Vimeo.Api.NetStandards.Client
         {
         }
 
+        #region Upload
         /// <summary>
         /// Determines if a video is owned by a user
         /// </summary>
@@ -29,34 +33,55 @@ namespace Vimeo.Api.NetStandards.Client
             return apiResults.StatusCode == HttpStatusCode.NotFound;
         }
 
-        #region Resumeable Upload
-        public async Task<Video> CreateVideo(long fileSize, long? userId)
+        public async Task<Video> InitialiseUpload(UploadVideo uploadVideo, long? userId)
         {
+            Client.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
+
             var url = userId.HasValue ?
                 $"{BaseUrl}/user/{userId}/videos" :
                 $"{BaseUrl}/me/videos";
 
-            var body = new UploadVideo
-            {
-                Upload = new Upload
-                {
-                    Size = fileSize
-                }
-            };
-            var apiResults = await Client.PostAsync(url, new StringContent(JsonConvert.SerializeObject(body), Encoding.UTF8, "application/json"));
+            var apiResults = await Client.PostAsync(url, new StringContent(JsonConvert.SerializeObject(uploadVideo), Encoding.UTF8, "application/json"));
 
-            return new Video(); // todo
+            var videoInfo = JsonConvert.DeserializeObject<Video>(await apiResults.Content.ReadAsStringAsync());
+
+            return videoInfo;
         }
 
+        public async Task<long> ResumeableUpload(string uploadUrl, Stream file, string fileName, long uploadOffset = 0)
+        {
+            Client.DefaultRequestHeaders.TryAddWithoutValidation("Tus-Resumable", "1.0.0");
+            Client.DefaultRequestHeaders.TryAddWithoutValidation("Upload-Offset", uploadOffset.ToString());
+            Client.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/offset+octet-stream");
 
-        #endregion
+            var method = new HttpMethod("PATCH");
+            var request = new HttpRequestMessage(method, uploadUrl)
+            {
+                Content = new MultipartFormDataContent
+                {
+                    new StreamContent(file)
+                }
+            };
 
-        #region Form-Based Upload
+            var apiResponse = await Client.SendAsync(request);
+            var uploadOffsetHeader = apiResponse.Headers.GetValues("Upload-Offset").FirstOrDefault();
 
-        #endregion
+            return Convert.ToInt64(uploadOffsetHeader);
+        }
 
-        #region Pull Upload
+        public async Task<bool> IsUploadCompleted(string uploadUrl)
+        {
+            Client.DefaultRequestHeaders.TryAddWithoutValidation("Tus-Resumable", "1.0.0");
 
+            var method = new HttpMethod("HEAD");
+            var request = new HttpRequestMessage(method, uploadUrl);
+
+            var apiResponse = await Client.SendAsync(request);
+            var uploadOffsetHeader = apiResponse.Headers.GetValues("Upload-Offset").FirstOrDefault();
+            var uploadLengthHeader = apiResponse.Headers.GetValues("Upload-Length").FirstOrDefault();
+
+            return uploadLengthHeader == uploadOffsetHeader;
+        }
         #endregion
     }
 }

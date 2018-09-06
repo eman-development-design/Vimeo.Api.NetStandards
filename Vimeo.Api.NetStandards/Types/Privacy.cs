@@ -22,18 +22,19 @@ namespace Vimeo.Api.NetStandards.Types
         /// <summary>
         /// Download
         /// </summary>
+        [JsonProperty("download")]
         public bool Download { get; set; }
 
         /// <summary>
         /// Add
         /// </summary>
-        [JsonProperty("add")]
+        [JsonProperty("add", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public bool Add { get; set; }
 
         /// <summary>
         /// Comment Privacy
         /// </summary>
-        [JsonProperty("comments")]
+        [JsonProperty("comments", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public string Comment { get; set; }
     }
 }

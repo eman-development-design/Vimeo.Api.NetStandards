@@ -37,7 +37,6 @@ namespace Vimeo.Api.NetStandards.Client
 
             Client.DefaultRequestHeaders.Accept.Clear();
             Client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/vnd.vimeo.*+json;version=3.4"));
-            Client.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
             Client.DefaultRequestHeaders.TryAddWithoutValidation("Authorization", _authorization);
         }
     }
