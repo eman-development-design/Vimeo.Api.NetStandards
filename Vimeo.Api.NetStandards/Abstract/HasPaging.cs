@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Newtonsoft.Json;
 using Vimeo.Api.NetStandards.Types;
 
@@ -16,5 +17,8 @@ namespace Vimeo.Api.NetStandards.Abstract
 
         [JsonProperty("paging")]
         public Paging Paging { get; set; }
+
+        [JsonProperty("data")]
+        public List<T> Data { get; set; }
     }
 }

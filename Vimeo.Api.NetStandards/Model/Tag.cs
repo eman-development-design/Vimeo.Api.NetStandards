@@ -34,5 +34,11 @@ namespace Vimeo.Api.NetStandards.Model
 
         [JsonProperty("metadata")]
         public MetaData MetaData { get; set; }
+
+        /// <summary>
+        /// Resource Key
+        /// </summary>
+        [JsonProperty("resource_key", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public string ResourceKey { get; set; }
     }
 }
