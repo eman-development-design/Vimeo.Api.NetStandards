@@ -9,6 +9,7 @@ using JetBrains.Annotations;
 using Newtonsoft.Json;
 using Vimeo.Api.NetStandards.Abstract;
 using Vimeo.Api.NetStandards.Model;
+using Vimeo.Api.NetStandards.Types;
 
 namespace Vimeo.Api.NetStandards.Client
 {
@@ -33,7 +34,7 @@ namespace Vimeo.Api.NetStandards.Client
         {
             Client.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
 
-            var apiResults = await Client.GetAsync($"{BaseUrl}/user/{userId}/videos/{videoId}");
+            var apiResults = await Client.GetAsync(BuildUrl($"user/{userId}/videos/{videoId}"));
 
             return apiResults.StatusCode == HttpStatusCode.NotFound;
         }
@@ -50,8 +51,8 @@ namespace Vimeo.Api.NetStandards.Client
             Client.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
 
             var url = userId.HasValue ?
-                $"{BaseUrl}/user/{userId}/videos" :
-                $"{BaseUrl}/me/videos";
+                BuildUrl($"user/{userId}/videos") :
+                BuildUrl("me/videos");
 
             var apiResults = await Client.PostAsync(url, new StringContent(JsonConvert.SerializeObject(uploadVideo), Encoding.UTF8, "application/json"));
 
@@ -116,15 +117,101 @@ namespace Vimeo.Api.NetStandards.Client
         /// Get a video
         /// </summary>
         /// <param name="videoId">Video Id</param>
+        /// <param name="fields">Fields we want to return back (Optional)</param>
         /// <returns>Video Object</returns>
         [PublicAPI]
-        public async Task<Video> GetVideo(long videoId)
+        public async Task<Video> GetVideo(long videoId, string[] fields = null)
         {
             Client.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
 
-            var apiResponse = await Client.GetAsync($"{BaseUrl}/videos/{videoId}");
+            var apiResponse = await Client.GetAsync(BuildGetUrl($"videos/{videoId}", fields));
 
             return JsonConvert.DeserializeObject<Video>(await apiResponse.Content.ReadAsStringAsync());
+        }
+
+        /// <summary>
+        /// Get a video's related videos
+        /// </summary>
+        /// <param name="videoId">Video Id</param>
+        /// <param name="fields">Fields we want to return back (Optional)</param>
+        /// <param name="page">Current Page (Optional)</param>
+        /// <param name="perPage">Items per page (Optional)</param>
+        /// <param name="contentRatingFilter">Filter by Video's Content Rating (Optional)</param>
+        /// <returns>Paging list of Video</returns>
+        [PublicAPI]
+        public async Task<HasPaging<Video>> GetRelatedVideos(long videoId, string[] fields = null, int? page = null, int? perPage = null, string[] contentRatingFilter = null)
+        {
+            Client.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
+
+            var apiResponse = await Client.GetAsync(BuildGetUrl($"videos/{videoId}/videos", fields, page, perPage, null, null, "related", contentRatingFilter));
+
+            return JsonConvert.DeserializeObject<HasPaging<Video>>(await apiResponse.Content.ReadAsStringAsync());
+        }
+
+        /// <summary>
+        /// Get all Creative Commons licenses
+        /// </summary>
+        /// <param name="fields">Fields we want to return back (Optional)</param>
+        /// <param name="page">Current Page (Optional)</param>
+        /// <param name="perPage">Items per page (Optional)</param>
+        /// <returns>Paging list of select list object</returns>
+        [PublicAPI]
+        public async Task<HasPaging<SelectList>> GetCreativeCommonsLicenses(string[] fields = null, int? page = null, int? perPage = null)
+        {
+            Client.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
+
+            var apiResponse = await Client.GetAsync(BuildGetUrl($"creativecommons", fields, page, perPage));
+
+            return JsonConvert.DeserializeObject<HasPaging<SelectList>>(await apiResponse.Content.ReadAsStringAsync());
+        }
+
+        /// <summary>
+        /// Get all comments on a video
+        /// </summary>
+        /// <param name="videoId">Video Id</param>
+        /// <param name="fields">Fields we want to return back (Optional)</param>
+        /// <param name="page">Current Page (Optional)</param>
+        /// <param name="perPage">Items per page (Optional)</param>
+        /// <returns>Paging list of comment object</returns>
+        [PublicAPI]
+        public async Task<HasPaging<Comment>> GetAllVideoComments(long videoId, string[] fields = null, int? page = null, int? perPage = null)
+        {
+            Client.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
+
+            var apiResponse = await Client.GetAsync(BuildGetUrl($"videos/{videoId}/comments", fields, page, perPage));
+
+            return JsonConvert.DeserializeObject<HasPaging<Comment>>(await apiResponse.Content.ReadAsStringAsync());
+        }
+
+        /// <summary>
+        /// Edit a video
+        /// </summary>
+        /// <param name="videoId"></param>
+        /// <param name="video"></param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
+        [PublicAPI]
+        public async Task<bool> UpdateEdit(long videoId, EditVideo video)
+        {
+            Client.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
+
+            var method = new HttpMethod("PATCH");
+            var request = new HttpRequestMessage(method, BuildUrl($"videos/{videoId}"))
+            {
+                Content = new StringContent(JsonConvert.SerializeObject(video))
+            };
+
+            var apiResponse = await Client.SendAsync(request);
+
+            switch (apiResponse.StatusCode)
+            {
+                case HttpStatusCode.Forbidden:
+                    throw new Exception("The authenticated user does not own the video or improper privacy settings.");
+                case HttpStatusCode.BadRequest:
+                    throw new Exception("Invalid parameter detected.");
+                default:
+                    return apiResponse.StatusCode == HttpStatusCode.OK;
+            }
         }
 
         #region Tags
@@ -132,13 +219,16 @@ namespace Vimeo.Api.NetStandards.Client
         /// Get a video's tags
         /// </summary>
         /// <param name="videoId">Video Id</param>
+        /// <param name="fields"></param>
+        /// <param name="page"></param>
+        /// <param name="perPage"></param>
         /// <returns>Paging List of Tag Object</returns>
         [PublicAPI]
-        public async Task<HasPaging<Tag>> GetVideoTags(long videoId)
+        public async Task<HasPaging<Tag>> GetVideoTags(long videoId, string[] fields = null, int? page = null, int? perPage = null)
         {
             Client.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
 
-            var apiResponse = await Client.GetAsync($"{BaseUrl}/videos/{videoId}/tags");
+            var apiResponse = await Client.GetAsync(BuildGetUrl($"/videos/{videoId}/tags", fields, page, perPage));
 
             return JsonConvert.DeserializeObject<HasPaging<Tag>>(await apiResponse.Content.ReadAsStringAsync());
         }
@@ -155,7 +245,7 @@ namespace Vimeo.Api.NetStandards.Client
         {
             Client.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
 
-            var apiResponse = await Client.PutAsync($"{BaseUrl}/videos/{videoId}/tags/{tag}", new StringContent(tag));
+            var apiResponse = await Client.PutAsync(BuildUrl($"videos/{videoId}/tags/{tag}"), new StringContent(tag));
 
             switch (apiResponse.StatusCode)
             {
@@ -180,7 +270,7 @@ namespace Vimeo.Api.NetStandards.Client
         {
             Client.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
 
-            var apiResponse = await Client.DeleteAsync($"{BaseUrl}/videos/{videoId}/tags/{tag}");
+            var apiResponse = await Client.DeleteAsync(BuildUrl($"videos/{videoId}/tags/{tag}"));
 
             switch (apiResponse.StatusCode)
             {
@@ -204,7 +294,7 @@ namespace Vimeo.Api.NetStandards.Client
         {
             Client.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
 
-            var apiResponse = await Client.DeleteAsync($"{BaseUrl}/videos/{videoId}/privacy/users/{userId}");
+            var apiResponse = await Client.DeleteAsync(BuildUrl($"videos/{videoId}/privacy/users/{userId}"));
 
             switch (apiResponse.StatusCode)
             {
@@ -229,7 +319,7 @@ namespace Vimeo.Api.NetStandards.Client
         {
             Client.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
 
-            var apiResponse = await Client.DeleteAsync($"{BaseUrl}/videos/{videoId}/privacy/domains/{domain}");
+            var apiResponse = await Client.DeleteAsync(BuildUrl($"videos/{videoId}/privacy/domains/{domain}"));
 
             switch (apiResponse.StatusCode)
             {
@@ -252,7 +342,7 @@ namespace Vimeo.Api.NetStandards.Client
         {
             Client.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
 
-            var apiResponse = await Client.DeleteAsync($"{BaseUrl}/videos/{videoId}");
+            var apiResponse = await Client.DeleteAsync(BuildUrl($"videos/{videoId}"));
 
             return apiResponse.StatusCode == HttpStatusCode.NoContent;
         }

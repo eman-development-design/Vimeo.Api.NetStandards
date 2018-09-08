@@ -1,12 +1,15 @@
 using System;
+using JetBrains.Annotations;
 using Newtonsoft.Json;
 using Vimeo.Api.NetStandards.Types;
+using Vimeo.Api.NetStandards.Types.MetaData;
 
 namespace Vimeo.Api.NetStandards.Model
 {
     /// <summary>
     /// Category Entity
     /// </summary>
+    [PublicAPI]
     public class Category
     {
         /// <summary>

@@ -1,5 +1,6 @@
 using Newtonsoft.Json;
 using Vimeo.Api.NetStandards.Types;
+using Vimeo.Api.NetStandards.Types.Embed;
 
 namespace Vimeo.Api.NetStandards.Model
 {

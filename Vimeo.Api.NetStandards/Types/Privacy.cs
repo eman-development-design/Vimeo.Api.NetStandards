@@ -35,6 +35,6 @@ namespace Vimeo.Api.NetStandards.Types
         /// Comment Privacy
         /// </summary>
         [JsonProperty("comments", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        public string Comment { get; set; }
+        public string Comments { get; set; }
     }
 }

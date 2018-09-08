@@ -16,7 +16,7 @@ namespace Vimeo.Api.NetStandards.Types
         /// <summary>
         /// Link
         /// </summary>
-        [JsonProperty("link")]
+        [JsonProperty("link", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public string Link { get; set; }
     }
 }

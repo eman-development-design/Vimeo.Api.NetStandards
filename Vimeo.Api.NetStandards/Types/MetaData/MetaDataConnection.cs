@@ -1,6 +1,6 @@
 using Newtonsoft.Json;
 
-namespace Vimeo.Api.NetStandards.Types
+namespace Vimeo.Api.NetStandards.Types.MetaData
 {
     /// <summary>
     /// Metadata Connection Type

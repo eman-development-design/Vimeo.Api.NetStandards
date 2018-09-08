@@ -1,11 +1,13 @@
+using JetBrains.Annotations;
 using Newtonsoft.Json;
-using Vimeo.Api.NetStandards.Types;
+using Vimeo.Api.NetStandards.Types.MetaData;
 
 namespace Vimeo.Api.NetStandards.Model
 {
     /// <summary>
     /// Tag Entity
     /// </summary>
+    [PublicAPI]
     public class Tag
     {
         /// <summary>
@@ -32,6 +34,9 @@ namespace Vimeo.Api.NetStandards.Model
         [JsonProperty("canonical")]
         public string Canonical { get; set; }
 
+        /// <summary>
+        /// Tag Metadata
+        /// </summary>
         [JsonProperty("metadata")]
         public MetaData MetaData { get; set; }
 

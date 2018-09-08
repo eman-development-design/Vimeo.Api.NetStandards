@@ -1,13 +1,16 @@
 using System;
 using System.Collections.Generic;
+using JetBrains.Annotations;
 using Newtonsoft.Json;
 using Vimeo.Api.NetStandards.Types;
+using Vimeo.Api.NetStandards.Types.MetaData;
 
 namespace Vimeo.Api.NetStandards.Model
 {
     /// <summary>
     /// User Entity
     /// </summary>
+    [PublicAPI]
     public class User
     {
         /// <summary>

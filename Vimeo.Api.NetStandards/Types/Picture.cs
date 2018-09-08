@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using JetBrains.Annotations;
 using Newtonsoft.Json;
 
 namespace Vimeo.Api.NetStandards.Types
@@ -6,6 +7,7 @@ namespace Vimeo.Api.NetStandards.Types
     /// <summary>
     /// Picture Type
     /// </summary>
+    [PublicAPI]
     public class Picture
     {
         /// <summary>

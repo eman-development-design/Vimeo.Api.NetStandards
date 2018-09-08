@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using Newtonsoft.Json;
 
-namespace Vimeo.Api.NetStandards.Types
+namespace Vimeo.Api.NetStandards.Types.Embed
 {
     /// <summary>
     /// Embed Settings
