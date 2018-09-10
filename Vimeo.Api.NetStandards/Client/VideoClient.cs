@@ -186,12 +186,11 @@ namespace Vimeo.Api.NetStandards.Client
         /// <summary>
         /// Edit a video
         /// </summary>
-        /// <param name="videoId"></param>
-        /// <param name="video"></param>
-        /// <returns></returns>
-        /// <exception cref="Exception"></exception>
+        /// <param name="videoId">Video Id</param>
+        /// <param name="video">Edit Video Body</param>
+        /// <returns>Vimeo Response</returns>
         [PublicAPI]
-        public async Task<bool> UpdateEdit(long videoId, EditVideo video)
+        public async Task<VimeoResponse> UpdateEdit(long videoId, EditVideo video)
         {
             Client.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
 
@@ -203,15 +202,23 @@ namespace Vimeo.Api.NetStandards.Client
 
             var apiResponse = await Client.SendAsync(request);
 
-            switch (apiResponse.StatusCode)
-            {
-                case HttpStatusCode.Forbidden:
-                    throw new Exception("The authenticated user does not own the video or improper privacy settings.");
-                case HttpStatusCode.BadRequest:
-                    throw new Exception("Invalid parameter detected.");
-                default:
-                    return apiResponse.StatusCode == HttpStatusCode.OK;
-            }
+            return JsonConvert.DeserializeObject<VimeoResponse>(await apiResponse.Content.ReadAsStringAsync());
+        }
+
+        /// <summary>
+        /// Create a new video thumbnail
+        /// </summary>
+        /// <param name="videoId">Video Id</param>
+        /// <param name="body">New Video Thumbnail Body</param>
+        /// <returns>Vimeo Response</returns>
+        [PublicAPI]
+        public async Task<VimeoResponse> CreateNewVideoThumbnail(long videoId, NewVideoThumbnail body)
+        {
+            Client.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
+
+            var apiResponse = await Client.PostAsync(BuildUrl($"videos/{videoId}/pictures"), new StringContent(JsonConvert.SerializeObject(body), Encoding.UTF8));
+
+            return JsonConvert.DeserializeObject<VimeoResponse>(await apiResponse.Content.ReadAsStringAsync());
         }
 
         #region Tags
@@ -238,24 +245,15 @@ namespace Vimeo.Api.NetStandards.Client
         /// </summary>
         /// <param name="videoId">Video Id</param>
         /// <param name="tag">Tag you wanted added</param>
-        /// <returns>bool</returns>
-        /// <exception cref="Exception">Error Responses from API</exception>
+        /// <returns>Vimeo Response</returns>
         [PublicAPI]
-        public async Task<bool> AddTagToVideo(long videoId, string tag)
+        public async Task<VimeoResponse> AddTagToVideo(long videoId, string tag)
         {
             Client.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
 
             var apiResponse = await Client.PutAsync(BuildUrl($"videos/{videoId}/tags/{tag}"), new StringContent(tag));
 
-            switch (apiResponse.StatusCode)
-            {
-                case HttpStatusCode.BadRequest:
-                    throw new Exception("Tag is invalid or string was invalid.");
-                case HttpStatusCode.Forbidden:
-                    throw new Exception("The number of tags on the video would exceed 20.");
-                default:
-                    return apiResponse.StatusCode == HttpStatusCode.NoContent;
-            }
+            return JsonConvert.DeserializeObject<VimeoResponse>(await apiResponse.Content.ReadAsStringAsync());
         }
 
         /// <summary>
@@ -263,22 +261,15 @@ namespace Vimeo.Api.NetStandards.Client
         /// </summary>
         /// <param name="videoId">video Id</param>
         /// <param name="tag">Tag you want removed</param>
-        /// <returns>bool</returns>
-        /// <exception cref="Exception">Error Responses from API</exception>
+        /// <returns>Vimeo Response</returns>
         [PublicAPI]
-        public async Task<bool> RemoveTagToVideo(long videoId, string tag)
+        public async Task<VimeoResponse> RemoveTagToVideo(long videoId, string tag)
         {
             Client.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
 
             var apiResponse = await Client.DeleteAsync(BuildUrl($"videos/{videoId}/tags/{tag}"));
 
-            switch (apiResponse.StatusCode)
-            {
-                case HttpStatusCode.BadRequest:
-                    throw new Exception("Tag was invalid.");
-                default:
-                    return apiResponse.StatusCode == HttpStatusCode.NoContent;
-            }
+            return JsonConvert.DeserializeObject<VimeoResponse>(await apiResponse.Content.ReadAsStringAsync());
         }
         #endregion
 
@@ -287,24 +278,15 @@ namespace Vimeo.Api.NetStandards.Client
         /// </summary>
         /// <param name="videoId">Video Id</param>
         /// <param name="userId">User Id</param>
-        /// <returns>bool</returns>
-        /// <exception cref="Exception">Error Responses from API</exception>
+        /// <returns>Vimeo Response</returns>
         [PublicAPI]
-        public async Task<bool> BlockUserAccessToVideo(long videoId, long userId)
+        public async Task<VimeoResponse> BlockUserAccessToVideo(long videoId, long userId)
         {
             Client.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
 
             var apiResponse = await Client.DeleteAsync(BuildUrl($"videos/{videoId}/privacy/users/{userId}"));
 
-            switch (apiResponse.StatusCode)
-            {
-                case HttpStatusCode.Forbidden:
-                    throw new Exception("The video is not set to a user-defined access list.");
-                case HttpStatusCode.NotFound:
-                    throw new Exception("The user was not found.");
-                default:
-                    return apiResponse.StatusCode == HttpStatusCode.NoContent;
-            }
+            return JsonConvert.DeserializeObject<VimeoResponse>(await apiResponse.Content.ReadAsStringAsync());
         }
 
         /// <summary>
@@ -312,39 +294,94 @@ namespace Vimeo.Api.NetStandards.Client
         /// </summary>
         /// <param name="videoId">Video Id</param>
         /// <param name="domain">Domain</param>
-        /// <returns>bool</returns>
-        /// <exception cref="Exception">Error Responses from API</exception>
+        /// <returns>Vimeo Response</returns>
         [PublicAPI]
-        public async Task<bool> BlockDomainFromEmbeddingVideo(long videoId, string domain)
+        public async Task<VimeoResponse> BlockDomainFromEmbeddingVideo(long videoId, string domain)
         {
             Client.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
 
             var apiResponse = await Client.DeleteAsync(BuildUrl($"videos/{videoId}/privacy/domains/{domain}"));
 
-            switch (apiResponse.StatusCode)
-            {
-                case HttpStatusCode.Forbidden:
-                    throw new Exception("The video is not set to a user-defined access list.");
-                case HttpStatusCode.NotFound:
-                    throw new Exception("The domain was not found.");
-                default:
-                    return apiResponse.StatusCode == HttpStatusCode.NoContent;
-            }
+            return JsonConvert.DeserializeObject<VimeoResponse>(await apiResponse.Content.ReadAsStringAsync());
         }
 
         /// <summary>
         /// Deletes a video
         /// </summary>
         /// <param name="videoId">Video Id</param>
-        /// <returns>bool</returns>
+        /// <returns>Vimeo Response</returns>
         [PublicAPI]
-        public async Task<bool> DeleteVideo(long videoId)
+        public async Task<VimeoResponse> DeleteVideo(long videoId)
         {
             Client.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
 
             var apiResponse = await Client.DeleteAsync(BuildUrl($"videos/{videoId}"));
 
-            return apiResponse.StatusCode == HttpStatusCode.NoContent;
+            return JsonConvert.DeserializeObject<VimeoResponse>(await apiResponse.Content.ReadAsStringAsync());
+        }
+
+        /// <summary>
+        /// Delete a comment from a video
+        /// </summary>
+        /// <param name="videoId">Video Id</param>
+        /// <param name="commentId">Comment Id</param>
+        /// <returns>Vimeo Response</returns>
+        [PublicAPI]
+        public async Task<VimeoResponse> DeleteVideoComment(long videoId, long commentId)
+        {
+            Client.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
+
+            var apiResponse = await Client.DeleteAsync(BuildUrl($"videos/{videoId}/comments/{commentId}"));
+
+            return JsonConvert.DeserializeObject<VimeoResponse>(await apiResponse.Content.ReadAsStringAsync());
+        }
+
+        /// <summary>
+        /// Delete a credit on a video
+        /// </summary>
+        /// <param name="videoId">Video Id</param>
+        /// <param name="creditId">Credit Id</param>
+        /// <returns>Vimeo Response</returns>
+        [PublicAPI]
+        public async Task<VimeoResponse> DeleteVideoCredit(long videoId, long creditId)
+        {
+            Client.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
+
+            var apiResponse = await Client.DeleteAsync(BuildUrl($"videos/{videoId}/credits/{creditId}"));
+
+            return JsonConvert.DeserializeObject<VimeoResponse>(await apiResponse.Content.ReadAsStringAsync());
+        }
+
+        /// <summary>
+        /// Delete a tag from a video
+        /// </summary>
+        /// <param name="videoId">Video Id</param>
+        /// <param name="tag">Tag</param>
+        /// <returns>Vimeo Response</returns>
+        [PublicAPI]
+        public async Task<VimeoResponse> DeleteTagFromVideo(long videoId, string tag)
+        {
+            Client.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
+
+            var apiResponse = await Client.DeleteAsync(BuildUrl($"videos/{videoId}/tags/{tag}"));
+
+            return JsonConvert.DeserializeObject<VimeoResponse>(await apiResponse.Content.ReadAsStringAsync());
+        }
+
+        /// <summary>
+        /// Delete a video text track
+        /// </summary>
+        /// <param name="videoId">Video Id</param>
+        /// <param name="textTrackId">Text Track Id</param>
+        /// <returns>Vimeo Response</returns>
+        [PublicAPI]
+        public async Task<VimeoResponse> DeleteVideoTextTrack(long videoId, long textTrackId)
+        {
+            Client.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
+
+            var apiResponse = await Client.DeleteAsync(BuildUrl($"videos/{videoId}/texttracks/{textTrackId}"));
+
+            return JsonConvert.DeserializeObject<VimeoResponse>(await apiResponse.Content.ReadAsStringAsync());
         }
     }
 }
