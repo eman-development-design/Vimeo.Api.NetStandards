@@ -206,6 +206,32 @@ namespace Vimeo.Api.NetStandards.Client
         }
 
         /// <summary>
+        /// Add a comment to a video
+        /// </summary>
+        /// <param name="videoId">Video Id</param>
+        /// <param name="body">New Video Comment Body</param>
+        /// <returns>Vimeo Response</returns>
+        [PublicAPI]
+        public async Task<VimeoResponse> AddCommentToVideo(long videoId, NewVideoComment body)
+        {
+            Client.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
+
+            var apiResponse = await Client.PostAsync(BuildUrl($"videos/{videoId}/comments"), new StringContent(JsonConvert.SerializeObject(body), Encoding.UTF8));
+
+            return JsonConvert.DeserializeObject<VimeoResponse>(await apiResponse.Content.ReadAsStringAsync());
+        }
+
+        [PublicAPI]
+        public async Task<VimeoResponse> AddCreditToVideo(long videoId, Credit credit)
+        {
+            Client.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
+
+            var apiResponse = await Client.PostAsync(BuildUrl($"videos/{videoId}/credits"), new StringContent(JsonConvert.SerializeObject(credit), Encoding.UTF8));
+
+            return JsonConvert.DeserializeObject<VimeoResponse>(await apiResponse.Content.ReadAsStringAsync());
+        }
+
+        /// <summary>
         /// Create a new video thumbnail
         /// </summary>
         /// <param name="videoId">Video Id</param>
