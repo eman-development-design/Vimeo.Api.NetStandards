@@ -9,30 +9,20 @@
 *.userosscache
 *.sln.docstates
 
-# User-specific files (MonoDevelop/Xamarin Studio)
-*.userprefs
-
 # Build results
 [Dd]ebug/
-[Dd]ebugPublic/
 [Rr]elease/
 [Rr]eleases/
 x64/
 x86/
-bld/
 [Bb]in/
 [Oo]bj/
-[Ll]og/
 
 # Visual Studio 2015/2017 cache/options directory
 .vs/
 
 # Visual Studio 2017 auto generated files
 Generated\ Files/
-
-# MSTest test Results
-[Tt]est[Rr]esult*/
-[Bb]uild[Ll]og.*
 
 # NUNIT
 *.VisualState.xml
@@ -44,51 +34,16 @@ project.fragment.lock.json
 artifacts/
 **/Properties/launchSettings.json
 
-# Files built by Visual Studio
-*_i.c
-*_p.c
-*_i.h
-*.ilk
-*.meta
-*.obj
-*.iobj
-*.pch
-*.pdb
-*.ipdb
-*.pgc
-*.pgd
-*.rsp
-*.sbr
-*.tlb
-*.tli
-*.tlh
-*.tmp
-*.tmp_proj
-*.log
-*.vspscc
-*.vssscc
-.builds
-*.pidb
-*.svclog
-*.scc
-
 # ReSharper is a .NET coding add-in
 _ReSharper*/
 *.[Rr]e[Ss]harper
 *.DotSettings.user
-
-# JustCode is a .NET coding add-in
-.JustCode
 
 # TeamCity is a build add-in
 _TeamCity*
 
 # DotCover is a Code Coverage Tool
 *.dotCover
-
-# AxoCover is a Code Coverage Tool
-.axoCover/*
-!.axoCover/settings.json
 
 # Visual Studio code coverage results
 *.coverage
@@ -120,19 +75,9 @@ PublishScripts/
 # but keep track of directories ending in .cache
 !*.[Cc]ache/
 
-# Others
-ClientBin/
-~$*
-*~
-*.dbmdl
-*.dbproj.schemaview
-*.jfm
-*.pfx
-*.publishsettings
-
 # Including strong name files can present a security risk
 # (https://github.com/github/gitignore/pull/2483#issue-259490424)
-#*.snk
+*.snk
 
 # Backup & report files from converting an old project file
 # to a newer Visual Studio version. Backup files are not needed,
@@ -148,5 +93,4 @@ ServiceFabricBackup/
 .idea/
 *.sln.iml
 
-# MFractors (Xamarin productivity tool) working folder
-.mfractor/
+appSettings.json
